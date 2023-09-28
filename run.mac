@@ -1,0 +1,5 @@
+/run/initialize
+/gun/momentumAmp 2.6 MeV
+/germanium/gerscale {scale}
+/run/reinitializeGeometry 
+/run/beamOn 100000
