@@ -4,11 +4,15 @@
 #include "G4VUserDetectorConstruction.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4Box.hh"
+#include "G4Tet.hh"
+#include "G4Polyhedra.hh"
+#include "G4RotationMatrix.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4NistManager.hh"
 #include "G4SystemOfUnits.hh" 
 #include "G4GenericMessenger.hh"
+#include <cmath>
 
 #include "detector.hh"
 
@@ -23,13 +27,16 @@ public:
     virtual G4VPhysicalVolume *Construct();
 private: 
     virtual void ConstructSDandField();
+    
+    G4RotationMatrix* Rotation(G4double, G4double, G4double);
 
     G4int nCols, nRows;
-    G4double gerscale;
+    G4double gerscale,thetax,thetay,thetaz;
 
-    G4Box *solidWorld, *solidGermanium, *solidDetector;
-    G4LogicalVolume *logicWorld, *logicGermanium, *logicDetector;
-    G4VPhysicalVolume *physWorld, *physGermanium, *physDetector;
+    G4Polyhedra *solidDoDi;
+    G4Box *solidGermanium, *solidDetector,*solidWorld;
+    G4LogicalVolume *logicWorld,*logicDoDi, *logicGermanium, *logicDetector;
+    G4VPhysicalVolume *physWorld,*physDoDi,*physDoDi1,*physDoDi2,*physDoDi3, *physGermanium, *physDetector;
 
     G4Material *worldMat, *germanium;
     G4GenericMessenger *fMessenger;

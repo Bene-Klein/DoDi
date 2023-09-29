@@ -29,52 +29,74 @@ void MyDetectorConstruction::DefineMaterials()
     germanium = nist->FindOrBuildMaterial("G4_Ge");
 }
 
+G4RotationMatrix* MyDetectorConstruction::Rotation(G4double thetax,G4double thetay,G4double thetaz)
+{
+    G4RotationMatrix* Rot =new G4RotationMatrix;
+    Rot->rotateX(thetax*deg);
+    Rot->rotateY(thetay*deg);
+    Rot->rotateZ(thetaz*deg);
+
+    return Rot;
+}
+
 G4VPhysicalVolume *MyDetectorConstruction::Construct()
 {
     //test//
-    G4double energy[2]={1.239841939*eV/0.9,1.239841939*eV/0.2};
-    G4double rindexWorld[2]={1.0,1.0};
-
-    G4MaterialPropertiesTable *mptWorld = new G4MaterialPropertiesTable();
-    mptWorld->AddProperty("RINDEX", energy, rindexWorld,2);
-    worldMat->SetMaterialPropertiesTable(mptWorld);
-    G4double xWorld = 0.5*m;
-    G4double yWorld = 0.5*m;
-    G4double zWorld = 0.5*m;
-
     G4double xGermanium = 0.05*m;
     G4double yGermanium = 0.05*m;
     G4double zGermanium = 0.05*m;
-    
+    G4double alpha = 72*M_PI/180;
+    G4double beta = 54*M_PI/180;
+    G4double dWorld = 0.5*m;
+    G4double lWorld = dWorld/(2*cos(beta)); 
 
+    G4double phiStart = 0;
+    G4double phiStart1 =36*M_PI/180;
+    G4double phiTotal = 2*M_PI;
+    G4int numSide =5;
+    G4int numZPlanes =2;
+    G4double rInner[] = {0,0};
+    G4double rOuter[] = {0,lWorld};
+    G4double zPlane[] = {0,1.114*dWorld}; 
+
+    G4cout << "a: " << alpha << G4endl;
+    G4cout << "b: " << beta << G4endl;
+    G4cout << "d: " << dWorld << G4endl;
+    G4cout << "l: " << lWorld << G4endl;
+    G4cout << "pRot: " << Rotation(0,0,36) << G4endl;
     //G4Box(*name,*size)
-    solidWorld = new G4Box("solidWorld",xWorld,yWorld,zWorld);
-    solidGermanium = new G4Box("solidGermanium", gerscale*xGermanium,gerscale*yGermanium,gerscale*zGermanium);
-    solidDetector = new G4Box("solidDetector",xWorld/nRows,yWorld/nCols,0.01*m);
+    solidWorld =new G4Box("solidWorld", 1*m,1*m,1*m);
+
+    solidDoDi =new G4Polyhedra("solidDoDi",phiStart,phiTotal,numSide,numZPlanes,zPlane,rInner,rOuter);
+    
 
     //G4LogicalVolume(*solidVolume,*material,*name)
     logicWorld = new G4LogicalVolume(solidWorld, worldMat, "logicWorld");
-    logicGermanium = new G4LogicalVolume(solidGermanium, germanium, "logicGermanium");    
-    logicDetector = new G4LogicalVolume(solidDetector, worldMat,"logicDetector");
-    fScoringVolume = logicGermanium;
+
+    logicDoDi = new G4LogicalVolume(solidDoDi, worldMat, "logicDoDi");
+  
 
     //G4PVPlacement(*Rotation,*Offset in Threevector,*logic Volume,*name,*Mothervolume,*boolean operation, *copynumber,*check for overlaps)
     physWorld = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),logicWorld,"physWorld",0,false,0,true);
-    physGermanium = new G4PVPlacement(0, G4ThreeVector(0.,0.,0),logicGermanium,"physGermanium",logicWorld,false,0,true);
-    for(G4int i=0; i<nRows;i++)
-    {
-        for(G4int j=0; j<nCols;j++)
-        {
-            physDetector = new G4PVPlacement(0,G4ThreeVector(-0.5*m+(i+0.5)*m/nRows,-0.5*m+(j+0.5)*m/nCols,0.49*m),logicDetector,"physDetector",logicWorld,false,j+i*nCols,true);
-        }
-    }
 
+    physDoDi = new G4PVPlacement(Rotation(0,0,0), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi",logicWorld,false,0,true);
+    physDoDi1 = new G4PVPlacement(Rotation(0,2*cos(1.114/1.309)*180/M_PI,36), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi1",logicWorld,false,0,true);
+    physDoDi2 = new G4PVPlacement(Rotation(1.5*cos(1.114/1.309)*180/M_PI,0.5*cos(1.114/1.309)*180/M_PI,36), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi2",logicWorld,false,0,true);
+    //physDoDi3 = new G4PVPlacement(Rotation(0,4*cos(1.114/1.309)*180/M_PI,0), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi3",logicWorld,false,0,true);
+
+    /*
+    for(G4int i=0; i<=6;i++)
+    {
+        physDoDi = new G4PVPlacement(Rotation(,,36), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi",logicWorld,false,0,true);
+    }
+   */ 
     return physWorld;
+    //return physWorld1;
 
 }
 void MyDetectorConstruction::ConstructSDandField()
 {
-    MySensitiveDetector *sensDet = new MySensitiveDetector("SensitiveDetector");
+    //MySensitiveDetector *sensDet = new MySensitiveDetector("SensitiveDetector");
 
-    logicDetector->SetSensitiveDetector(sensDet);
+    //logicDetector->SetSensitiveDetector(sensDet);
 }
