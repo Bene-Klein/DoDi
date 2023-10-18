@@ -7,6 +7,8 @@
 #include "G4Tet.hh"
 #include "G4Polyhedra.hh"
 #include "G4RotationMatrix.hh"
+#include "G4MultiUnion.hh"
+#include "CADMesh.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4NistManager.hh"
@@ -35,8 +37,8 @@ private:
 
     G4Polyhedra *solidDoDi;
     G4Box *solidGermanium, *solidDetector,*solidWorld;
-    G4LogicalVolume *logicWorld,*logicDoDi, *logicGermanium, *logicDetector;
-    G4VPhysicalVolume *physWorld,*physDoDi,*physDoDi1,*physDoDi2,*physDoDi3, *physGermanium, *physDetector;
+    G4LogicalVolume *logicWorld,*logicDoDi, *logicGermanium, *logicDetector, *logicObject, *logicmesh;
+    G4VPhysicalVolume *physWorld,*physDoDi,*physDoDi1,*physDoDi2,*physDoDi3, *physGermanium, *physDetector, *physObject, *physmesh;
 
     G4Material *worldMat, *germanium;
     G4GenericMessenger *fMessenger;
