@@ -27,32 +27,61 @@ void MyDetectorConstruction::DefineMaterials()
     
     worldMat = nist->FindOrBuildMaterial("G4_AIR");
     germanium = nist->FindOrBuildMaterial("G4_Ge");
+    aluminum = nist->FindOrBuildMaterial("G4_Al");
+
 }
 
-G4RotationMatrix* MyDetectorConstruction::Rotation(G4double thetax,G4double thetay,G4double thetaz)
+G4Transform3D MyDetectorConstruction::Rotation(G4double theta,G4double x_1,G4double y_1,G4double z_1,G4double x_2,G4double y_2,G4double z_2)
 {
-    G4RotationMatrix* Rot =new G4RotationMatrix;
-    Rot->rotateX(thetax*deg);
-    Rot->rotateY(thetay*deg);
-    Rot->rotateZ(thetaz*deg);
-
-    return Rot;
+    G4Rotate3D Rot = G4Rotate3D(theta,G4ThreeVector(x_1,y_1,z_1));
+    G4Translate3D pos = G4Translate3D(x_2,y_2,z_2);
+G4Transform3D Trans = G4Rotate3D(theta,G4ThreeVector(x_1,y_1,z_1))*G4Translate3D(x_2,y_2,z_2);
+    /*
+    Rot->rotateX(thetax);
+    Rot->rotateY(thetay);
+    Rot->rotateZ(thetaz);
+    */
+    return Trans;
+}
+G4Transform3D MyDetectorConstruction::doubleRotation(G4double theta,G4double x_1,G4double y_1,G4double z_1,G4double x_2,G4double y_2,G4double z_2)
+{
+    G4Rotate3D Rot = G4Rotate3D(theta,G4ThreeVector(x_1,y_1,z_1));
+    G4Translate3D pos = G4Translate3D(x_2,y_2,z_2);
+    G4Transform3D Trans = G4Rotate3D(theta,G4ThreeVector(x_1,y_1,z_1))*G4Rotate3D(180*degree,G4ThreeVector(0,1,0))*G4Translate3D(x_2,y_2,z_2);
+    /*
+    Rot->rotateX(thetax);
+    Rot->rotateY(thetay);
+    Rot->rotateZ(thetaz);
+    */
+    return Trans;
 }
 
 G4VPhysicalVolume *MyDetectorConstruction::Construct()
 {
     //test//
-    G4double xGermanium = 0.05*m;
-    G4double yGermanium = 0.05*m;
-    G4double zGermanium = 0.05*m;
     G4double alpha = 72*M_PI/180;
     G4double beta = 54*M_PI/180;
-    G4double dWorld = 0.5*m;
-    G4double lWorld = dWorld/(2*cos(beta));
+    G4double aWorld = 0.5*m;//mm
+    G4double lWorld = aWorld/(2*sin(36*degree));//mm
 
-    G4double r_i = (dWorld/20)*sqrt(250+110*sqrt(5));
-    G4double r_k = (dWorld/4)*(3+sqrt(5));
-    G4double Beta = cos(r_i/r_k)*180/M_PI;
+    G4double r_i = (aWorld/20)*sqrt(250+110*sqrt(5));//mm
+    G4double r_k = (aWorld/4)*(3+sqrt(5));//mm
+    G4double r_e = (aWorld/4)*sqrt(3)*(1+sqrt(5)); //mm   
+    G4double d_l = aWorld/(2*tan(36*degree));//mm
+
+    G4double R_i = (1.113516364)*aWorld;//mm
+    G4double R_k = 1.309016994*aWorld;//mm
+    
+    G4double Beta = acos(r_i/r_k);//Rad
+    G4double Alpha = acos(r_i/r_e);//Rad
+    G4double Gamma_div2 = asin(aWorld/(2*r_e));//Rad
+    G4double Theta = M_PI-2*atan((sqrt(5)-1)/2);//Rad
+    G4double Phi =(M_PI/2)+atan(((sqrt(5)-1)/2));//Rad
+    G4double Kappa =2*Beta-acos(d_l*cos(36*degree/r_i));//Rad
+
+ 
+
+    G4double world = 1*m;//mm
 
     G4double phiStart = 0;
     G4double phiStart1 =36*M_PI/180;
@@ -60,57 +89,100 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
     G4int numSide =5;
     G4int numZPlanes =2;
     G4double rInner[] = {0,0};
-    G4double rOuter[] = {0,lWorld};
-    G4double zPlane[] = {0,1.114*dWorld}; 
+    G4double rOuter[] = {0,d_l};
+    G4double zPlane[] = {0,r_i}; 
 
-    G4cout << "a: " << alpha << G4endl;
-    G4cout << "b: " << beta << G4endl;
-    G4cout << "d: " << dWorld << G4endl;
+    G4double pRMin =0;
+    G4double pRMax =10*mm;
+    G4double pDz = 1*m;
+    G4double pSPhi= 0;
+    G4double pDPhi= 2*M_PI;
+
+    G4cout << "a: " << aWorld << G4endl;
     G4cout << "l: " << lWorld << G4endl;
-    G4cout << "beta: " << Beta << G4endl;
-    G4cout << "pRot: " << Rotation(0,0,36) << G4endl;
+    G4cout << "d_l: " << d_l << G4endl;
+    G4cout << "r_i/aWorld: " << r_i/aWorld << G4endl;
+    G4cout << "r_i: " << r_i << G4endl;
+    G4cout << "r_k/aWorld: " << r_k/aWorld << G4endl;
+    G4cout << "beta: " << Beta*180/M_PI << G4endl;
+    G4cout << "theta: " << Theta*180/M_PI << G4endl;
+    G4cout << "phi: " << Phi*180/M_PI << G4endl;
+    G4cout << " pi?:" << 2*(Alpha+Beta+Gamma_div2) << G4endl;
+
+    
+
+    //G4cout << "pRot: " << Rotation(180,0,0,0,0,0,0) << G4endl;
     //G4Box(*name,*size)
-    solidWorld =new G4Box("solidWorld", 1*m,1*m,1*m);
+    solidWorld =new G4Box("solidWorld", world,world,world);
 
     solidDoDi =new G4Polyhedra("solidDoDi",phiStart,phiTotal,numSide,numZPlanes,zPlane,rInner,rOuter);
-    /*Multi union structre
-    G4RotationMatrix rotm = G4RotationMatrix();
-    G4ThreeVector pos = G4ThreeVector(0,0,0);
-    G4Transform3D tr1 = G4Transform3D(rotm,pos);
     
-    G4MultiUnion* munion_solid = new G4MultiUnion("DoDi");
-
-    munion_solid->AddNode(*solidDoDi,tr1);
-    munion_solid->AddNode(*solidDoDi,tr2);
-
-    munion_solid->Voxelize();*/
-    //auto mesh = CADMesh::TessellatedMesh::FromSTL("dodecahedron.stl");
-    //auto solidMesh = mesh->GetSolid();
+    solidTube =new G4Tubs("solidtube",pRMin,pRMax,pDz,pSPhi,pDPhi);
     //G4LogicalVolume(*solidVolume,*material,*name)
     logicWorld = new G4LogicalVolume(solidWorld, worldMat, "logicWorld");
 
-    logicDoDi = new G4LogicalVolume(solidDoDi, worldMat, "logicDoDi");
-    //logicmesh = new G4LogicalVolume(solidMesh, worldMat, "logicmesh");
-  
-    //logicObject = new G4LogicalVolume(munion_solid,worldMat,"logicObject");
+    logicDoDi = new G4LogicalVolume(solidDoDi, aluminum, "logicDoDi");
+
+    logicTube = new G4LogicalVolume(solidTube, worldMat, "logicTube");
+
 
     //G4PVPlacement(*Rotation,*Offset in Threevector,*logic Volume,*name,*Mothervolume,*boolean operation, *copynumber,*check for overlaps)
     physWorld = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),logicWorld,"physWorld",0,false,0,true);
-    //physmesh = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),logicmesh,"physmesh",logicWorld,false,0,true);
+    
+    physTube = new G4PVPlacement(
+        Rotation(180*degree,-r_i*sin(Kappa)/2,0,r_i*cos(Kappa)/2,0,0,0),
+        logicTube,"physTube",logicWorld,false,0,true);
+    
+    physDoDi = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi",logicWorld,false,0,true);
+    //(d_l+sin(Phi-(M_PI/2)))/2
 
-    //physObject = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),logicObject,"physObject",logicWorld,false,0,true);
+    //
+    physDoDi1 = new G4PVPlacement(
+        Rotation(180*degree,-r_i*tan(Beta),0,r_i,0,0,0),
+        logicDoDi,"physDoDi1",logicWorld,false,0,true);
+    physDoDi2 = new G4PVPlacement(
+        Rotation(180*degree,-r_i*tan(Beta)*cos(72*degree),-r_i*tan(Beta)*sin(72*degree),r_i,0,0,0),
+        logicDoDi,"physDoDi2",logicWorld,false,0,true);
+    physDoDi3 = new G4PVPlacement(
+        Rotation(180*degree,-r_i*tan(Beta)*cos(72*degree),r_i*tan(Beta)*sin(72*degree),r_i,0,0,0),
+        logicDoDi,"physDoDi3",logicWorld,false,0,true);
+    physDoDi4 = new G4PVPlacement(
+        Rotation(180*degree,-r_i*tan(Beta)*cos(2*72*degree),-r_i*tan(Beta)*sin(2*72*degree),r_i,0,0,0),
+        logicDoDi,"physDoDi4",logicWorld,false,0,true);
+    physDoDi5 = new G4PVPlacement(
+        Rotation(180*degree,-r_i*tan(Beta)*cos(2*72*degree),r_i*tan(Beta)*sin(2*72*degree),r_i,0,0,0),
+        logicDoDi,"physDoDi5",logicWorld,false,0,true);
+    //###
 
-    physDoDi = new G4PVPlacement(Rotation(0,0,0), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi",logicWorld,false,0,true);
-    physDoDi1 = new G4PVPlacement(Rotation(0,2*Beta,36), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi1",logicWorld,false,0,true);
-    physDoDi2 = new G4PVPlacement(Rotation(Beta,Beta,18), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi2",logicWorld,false,0,true);
-    //physDoDi3 = new G4PVPlacement(Rotation(0,4*cos(1.114/1.309)*180/M_PI,0), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi3",logicWorld,false,0,true);
+    //###
+    physDoDi0 = new G4PVPlacement(
+        Rotation(180*degree,0,1,0,0,0,0),
+        logicDoDi,"physDoDi0",logicWorld,false,0,true);
+    //
+
+    //
+    physDoDi01 = new G4PVPlacement(
+        doubleRotation(180*degree,-r_i*tan(Beta),0,r_i,0,0,0),
+        logicDoDi,"physDoDi01",logicWorld,false,0,true);
+    physDoDi02 = new G4PVPlacement(
+        doubleRotation(180*degree,-r_i*tan(Beta)*cos(72*degree),-r_i*tan(Beta)*sin(72*degree),r_i,0,0,0),
+        logicDoDi,"physDoDi2",logicWorld,false,0,true);
+    physDoDi03 = new G4PVPlacement(
+        doubleRotation(180*degree,-r_i*tan(Beta)*cos(72*degree),r_i*tan(Beta)*sin(72*degree),r_i,0,0,0),
+        logicDoDi,"physDoDi3",logicWorld,false,0,true);
+    physDoDi04 = new G4PVPlacement(
+        doubleRotation(180*degree,-r_i*tan(Beta)*cos(2*72*degree),-r_i*tan(Beta)*sin(2*72*degree),r_i,0,0,0),
+        logicDoDi,"physDoDi4",logicWorld,false,0,true);
+    physDoDi05 = new G4PVPlacement(
+        doubleRotation(180*degree,-r_i*tan(Beta)*cos(2*72*degree),r_i*tan(Beta)*sin(2*72*degree),r_i,0,0,0),
+        logicDoDi,"physDoDi5",logicWorld,false,0,true);
 
     /*
-    for(G4int i=0; i<=6;i++)
+    for(G4int i=0; i<=360;i=i+10)
     {
-        physDoDi = new G4PVPlacement(Rotation(,,36), G4ThreeVector(0.,0.,0.),logicDoDi,"physDoDi",logicWorld,false,0,true);
+        physDoDi1 = new G4PVPlacement(Rotation(i*degree,-cos(Beta*M_PI/180)*r_i,0,r_i,0,0,0),logicDoDi,"physDoDi1",logicWorld,false,0,true);
     }
-   */ 
+    */
     return physWorld;
     //return physWorld1;
 
