@@ -130,30 +130,39 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
 
     //G4PVPlacement(*Rotation,*Offset in Threevector,*logic Volume,*name,*Mothervolume,*boolean operation, *copynumber,*check for overlaps)
     physWorld = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),logicWorld,"physWorld",0,false,0,true);
-    
-    physTube = new G4PVPlacement(
-        Rotation(180*degree,-r_i*sin(Kappa)/2,0,r_i*cos(Kappa)/2,0,0,0),
-        logicTube,"physTube",logicWorld,false,0,true);
-    
-    
+       
+    for(G4int i=0; i<=1;i++)
+        {
+            physDoDi0 = new G4PVPlacement(
+                Rotation(i*180*degree,-i*r_i*tan(Beta),0,r_i,0,0,0),
+                logicDoDi,"physDoDi0",logicWorld,false,i,true);
+        }
 
     for(G4int j=1; j<=2;j++)
     {
-            for(G4int i=0; i<=2;i++)
+            for(G4int i=1; i<=2;i++)
         {
             physDoDi = new G4PVPlacement(
                 Rotation(180*degree,-r_i*tan(Beta)*cos(i*72*degree),pow(-1,j)*r_i*tan(Beta)*sin(i*72*degree),r_i,0,0,0),
-                logicDoDi,"physDoDi",logicWorld,false,0,true);
+                logicDoDi,"physDoDi",logicWorld,false,i+j*10,true);
         }
        
     }
-    for(G4int j=1; j<=2;j++)
+
+    for(G4int i=0; i<=1;i++)
     {
-            for(G4int i=0; i<=2;i++)
+        physDoDi01 = new G4PVPlacement(
+            doubleRotation(i*180*degree,-i*r_i*tan(Beta),0,r_i,0,0,0),
+            logicDoDi,"physDoDi01",logicWorld,false,i+2,true);
+    }
+
+    for(G4int j=0; j<=1;j++)
+    {
+            for(G4int i=1; i<=2;i++)
         {
             physDoDi1 = new G4PVPlacement(
                 doubleRotation(180*degree,-r_i*tan(Beta)*cos(i*72*degree),pow(-1,j)*r_i*tan(Beta)*sin(i*72*degree),r_i,0,0,0),
-                logicDoDi,"physDoDi1",logicWorld,false,0,true);
+                logicDoDi,"physDoDi1",logicWorld,false,i+j*10+100,true);
         }
        
     }
@@ -166,7 +175,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         {
             physDetector1 = new G4PVPlacement(
                 Rotation(180*degree,-r_i*tan(Beta)*cos(i*72*degree),pow(-1,j)*r_i*tan(Beta)*sin(i*72*degree),r_i,0,0,r_i+5*mm),
-                logicDetector,"physDetector",logicWorld,false,i+j*10,true);
+                logicDetector,"physDetector",logicWorld,false,i+j*10+1000,true);
         }
        
     }
@@ -177,7 +186,7 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         {
             physDetector2 = new G4PVPlacement(
                 doubleRotation(180*degree,-r_i*tan(Beta)*cos(i*72*degree),pow(-1,j)*r_i*tan(Beta)*sin(i*72*degree),r_i,0,0,r_i+5*mm),
-                logicDetector,"physDetector",logicWorld,false,i+j*10,true);
+                logicDetector,"physDetector",logicWorld,false,i+j*10+10000,true);
         }
        
     }
