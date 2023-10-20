@@ -40,8 +40,8 @@ private:
     G4double gerscale,thetax,thetay,thetaz;
 
     G4Polyhedra *solidDoDi, *solidDoDi1;
-    G4Tubs *solidTube;
-    G4Box *solidGermanium, *solidDetector,*solidWorld;
+    G4Tubs *solidDetector,*solidTube;
+    G4Box *solidGermanium, *solidWorld;
     G4LogicalVolume *logicWorld,*logicDoDi,*logicDoDi1, *logicGermanium, *logicDetector, *logicObject, *logicmesh, *logicTube;
     G4VPhysicalVolume *physWorld,*physDoDi,*physDoDi1,*physDoDi2,*physDoDi3,*physDoDi4,*physDoDi5,*physDoDi0,*physDoDi01,*physDoDi02,*physDoDi03,*physDoDi04,*physDoDi05, *physGermanium, *physDetector, *physObject, *physmesh, *physTube;
 
