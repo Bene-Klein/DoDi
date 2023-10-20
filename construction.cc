@@ -27,15 +27,14 @@ void MyDetectorConstruction::DefineMaterials()
     
     worldMat = nist->FindOrBuildMaterial("G4_AIR");
     germanium = nist->FindOrBuildMaterial("G4_Ge");
-    aluminum = nist->FindOrBuildMaterial("G4_Al");
+    aluminum = nist->FindOrBuildMaterial("G4_WATER");
 
 }
-
 G4Transform3D MyDetectorConstruction::Rotation(G4double theta,G4double x_1,G4double y_1,G4double z_1,G4double x_2,G4double y_2,G4double z_2)
 {
     G4Rotate3D Rot = G4Rotate3D(theta,G4ThreeVector(x_1,y_1,z_1));
     G4Translate3D pos = G4Translate3D(x_2,y_2,z_2);
-G4Transform3D Trans = G4Rotate3D(theta,G4ThreeVector(x_1,y_1,z_1))*G4Translate3D(x_2,y_2,z_2);
+    G4Transform3D Trans = G4Rotate3D(theta,G4ThreeVector(x_1,y_1,z_1))*G4Translate3D(x_2,y_2,z_2);
     /*
     Rot->rotateX(thetax);
     Rot->rotateY(thetay);
@@ -158,13 +157,26 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         }
        
     }
-    //physDetector = new G4PVPlacement(0, G4ThreeVector(0.,0.,r_i+5*mm),logicDetector,"physDetector",logicWorld,false,0,true);
-    for(G4int j=1; j<=2;j++)
+    physDetector = new G4PVPlacement(
+                Rotation(180*degree,0,0,0,0,0,-(r_i+5*mm)),
+                logicDetector,"physDetector",logicWorld,false,0,true);
+        for(G4int j=1; j<=2;j++)
     {
-            for(G4int i=0; i<=2;i++)
+            for(G4int i=1; i<=2;i++)
         {
-            physDetector = new G4PVPlacement(
-                Rotation(0,-r_i*tan(Beta)*cos(i*72*degree),pow(-1,j)*r_i*tan(Beta)*sin(i*72*degree),r_i,0,0,r_i+5*mm),
+            physDetector1 = new G4PVPlacement(
+                Rotation(180*degree,-r_i*tan(Beta)*cos(i*72*degree),pow(-1,j)*r_i*tan(Beta)*sin(i*72*degree),r_i,0,0,r_i+5*mm),
+                logicDetector,"physDetector",logicWorld,false,i+j*10,true);
+        }
+       
+    }
+
+        for(G4int j=1; j<=2;j++)
+    {
+            for(G4int i=1; i<=2;i++)
+        {
+            physDetector2 = new G4PVPlacement(
+                doubleRotation(180*degree,-r_i*tan(Beta)*cos(i*72*degree),pow(-1,j)*r_i*tan(Beta)*sin(i*72*degree),r_i,0,0,r_i+5*mm),
                 logicDetector,"physDetector",logicWorld,false,i+j*10,true);
         }
        
