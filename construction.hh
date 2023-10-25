@@ -44,7 +44,7 @@ private:
     G4Tubs *solidDetector,*solidTube;
     G4Box *solidGermanium, *solidWorld;
     G4LogicalVolume *logicWorld,*logicDoDi,*logicDoDi1, *logicGermanium, *logicDetector, *logicObject, *logicmesh, *logicTube;
-    G4VPhysicalVolume *physWorld,*physDoDi,*physDoDi1,*physDoDi0,*physDoDi01,*physDetector,*physDetector1,*physDetector2,*physTube;
+    G4VPhysicalVolume *physWorld,*physDoDi,*physDoDi1,*physDoDi0,*physDoDi01,*physDetector,*physDetector1,*physDetector2,*physDetector3,*physTube;
 
     G4Material *worldMat, *germanium, *aluminum;
     G4GenericMessenger *fMessenger;
