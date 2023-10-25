@@ -9,6 +9,8 @@
 #include "G4Tubs.hh"
 #include "G4RotationMatrix.hh"
 #include "G4MultiUnion.hh"
+#include "G4LogicalBorderSurface.hh"
+#include "G4OpticalSurface.hh"
 #include "CADMesh.hh"
 #include "G4Transform3D.hh"
 #include "G4LogicalVolume.hh"
@@ -44,9 +46,9 @@ private:
     G4Tubs *solidDetector,*solidTube;
     G4Box *solidGermanium, *solidWorld;
     G4LogicalVolume *logicWorld,*logicDoDi,*logicDoDi1, *logicGermanium, *logicDetector, *logicObject, *logicmesh, *logicTube;
-    G4VPhysicalVolume *physWorld,*physDoDi,*physDoDi1,*physDoDi0,*physDoDi01,*physDetector,*physDetector1,*physDetector2,*physDetector3,*physTube;
+    G4VPhysicalVolume *physWorld,*physDoDi1,*physDoDi2,*physDoDi3,*physDoDi4,*physDoDi5,*physDoDi6,*physDoDi7,*physDoDi8,*physDoDi9,*physDoDi10,*physDoDi11,*physDoDi12,*physDetector,*physDetector1,*physDetector2,*physDetector3,*physTube;
 
-    G4Material *worldMat, *germanium, *aluminum;
+    G4Material *worldMat, *germanium, *water;
     G4GenericMessenger *fMessenger;
 
     void DefineMaterials();

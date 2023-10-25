@@ -27,7 +27,7 @@ void MyDetectorConstruction::DefineMaterials()
     
     worldMat = nist->FindOrBuildMaterial("G4_AIR");
     germanium = nist->FindOrBuildMaterial("G4_Ge");
-    aluminum = nist->FindOrBuildMaterial("G4_WATER");
+    water = nist->FindOrBuildMaterial("G4_WATER");
 
 }
 G4Transform3D MyDetectorConstruction::Rotation(G4double theta,G4double x_1,G4double y_1,G4double z_1,G4double x_2,G4double y_2,G4double z_2)
@@ -78,8 +78,24 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
     G4double Phi =(M_PI/2)+atan(((sqrt(5)-1)/2));//Rad
     G4double Kappa =2*Beta-acos(d_l*cos(36*degree/r_i));//Rad
 
- 
+    G4double energy[2]={1.239841939*eV/0.9,1.239841939*eV/0.2};
+    G4double rindexWorld[2]={1.0,1.0};
+    G4double rindexWater[2]={1.33,1.33};
+    G4double transmittance[2]={0,0};
+    G4double reflectivity[2]={0.9,0.9};
+    G4double absH2O[2]={20*m,20*m};
 
+
+    G4MaterialPropertiesTable *mptWorld = new G4MaterialPropertiesTable();
+    mptWorld->AddProperty("RINDEX", energy, rindexWorld,2);
+    worldMat->SetMaterialPropertiesTable(mptWorld); 
+
+    G4MaterialPropertiesTable *mptwater = new G4MaterialPropertiesTable();
+    mptwater->AddProperty("RINDEX", energy, rindexWater,2);
+    mptwater->AddProperty("ABSLENGTH", energy, absH2O,2);
+    water->SetMaterialPropertiesTable(mptwater);
+
+    
     G4double world = 1*m;//mm
 
     G4double phiStart = 0;
@@ -122,50 +138,52 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
     //G4LogicalVolume(*solidVolume,*material,*name)
     logicWorld = new G4LogicalVolume(solidWorld, worldMat, "logicWorld");
 
-    logicDoDi = new G4LogicalVolume(solidDoDi, aluminum, "logicDoDi");
+    logicDoDi = new G4LogicalVolume(solidDoDi, water, "logicDoDi");
 
     logicTube = new G4LogicalVolume(solidTube, worldMat, "logicTube");
 
-    logicDetector = new G4LogicalVolume(solidDetector, worldMat, "logicDetector");
+    logicDetector = new G4LogicalVolume(solidDetector, water, "logicDetector");
 
     //G4PVPlacement(*Rotation,*Offset in Threevector,*logic Volume,*name,*Mothervolume,*boolean operation, *copynumber,*check for overlaps)
     physWorld = new G4PVPlacement(0, G4ThreeVector(0.,0.,0.),logicWorld,"physWorld",0,false,0,true);
-       
-    for(G4int i=0; i<=1;i++)
-        {
-            physDoDi0 = new G4PVPlacement(
-                Rotation(i*180*degree,-i*r_i*tan(Beta),0,r_i,0,0,0),
-                logicDoDi,"physDoDi0",logicWorld,false,i,true);
-        }
 
-    for(G4int j=1; j<=2;j++)
-    {
-            for(G4int i=1; i<=2;i++)
-        {
-            physDoDi = new G4PVPlacement(
-                Rotation(180*degree,-r_i*tan(Beta)*cos(i*72*degree),pow(-1,j)*r_i*tan(Beta)*sin(i*72*degree),r_i,0,0,0),
-                logicDoDi,"physDoDi",logicWorld,false,i+j*10,true);
-        }
-       
-    }
+    physDoDi1 = new G4PVPlacement(
+                Rotation(0,0,0,r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,1,true);
+    physDoDi2 = new G4PVPlacement(
+                Rotation(180*degree,-r_i*tan(Beta),0,r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,2,true);
+    physDoDi3 = new G4PVPlacement(
+                Rotation(180*degree,-r_i*tan(Beta)*cos(72*degree),r_i*tan(Beta)*sin(72*degree),r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,3,true);
+    physDoDi4 = new G4PVPlacement(
+                Rotation(180*degree,-r_i*tan(Beta)*cos(2*72*degree),r_i*tan(Beta)*sin(2*72*degree),r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,4,true);
+    physDoDi5 = new G4PVPlacement(
+                Rotation(180*degree,-r_i*tan(Beta)*cos(72*degree),-r_i*tan(Beta)*sin(72*degree),r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,5,true);
+    physDoDi6 = new G4PVPlacement(
+                Rotation(180*degree,-r_i*tan(Beta)*cos(2*72*degree),-r_i*tan(Beta)*sin(2*72*degree),r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,6,true);
+    physDoDi7 = new G4PVPlacement(
+                doubleRotation(0,0,0,r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,1,true);
+    physDoDi8 = new G4PVPlacement(
+                doubleRotation(180*degree,-r_i*tan(Beta),0,r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,2,true);
+    physDoDi9 = new G4PVPlacement(
+                doubleRotation(180*degree,-r_i*tan(Beta)*cos(72*degree),r_i*tan(Beta)*sin(72*degree),r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,3,true);
+    physDoDi10 = new G4PVPlacement(
+                doubleRotation(180*degree,-r_i*tan(Beta)*cos(2*72*degree),r_i*tan(Beta)*sin(2*72*degree),r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,4,true);
+    physDoDi11 = new G4PVPlacement(
+                doubleRotation(180*degree,-r_i*tan(Beta)*cos(72*degree),-r_i*tan(Beta)*sin(72*degree),r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,5,true);
+    physDoDi12 = new G4PVPlacement(
+                doubleRotation(180*degree,-r_i*tan(Beta)*cos(2*72*degree),-r_i*tan(Beta)*sin(2*72*degree),r_i,0,0,0),
+                logicDoDi,"physDoDi",logicWorld,false,6,true);
 
-    for(G4int i=0; i<=1;i++)
-    {
-        physDoDi01 = new G4PVPlacement(
-            doubleRotation(i*180*degree,-i*r_i*tan(Beta),0,r_i,0,0,0),
-            logicDoDi,"physDoDi01",logicWorld,false,i+2,true);
-    }
-
-    for(G4int j=0; j<=1;j++)
-    {
-            for(G4int i=1; i<=2;i++)
-        {
-            physDoDi1 = new G4PVPlacement(
-                doubleRotation(180*degree,-r_i*tan(Beta)*cos(i*72*degree),pow(-1,j)*r_i*tan(Beta)*sin(i*72*degree),r_i,0,0,0),
-                logicDoDi,"physDoDi1",logicWorld,false,i+j*10+100,true);
-        }
-       
-    }
     for(G4int i=0; i<=1;i++)
         {
             physDetector = new G4PVPlacement(
@@ -205,6 +223,33 @@ G4VPhysicalVolume *MyDetectorConstruction::Construct()
         physDoDi1 = new G4PVPlacement(Rotation(i*degree,-cos(Beta*M_PI/180)*r_i,0,r_i,0,0,0),logicDoDi,"physDoDi1",logicWorld,false,0,true);
     }
     */
+
+   G4OpticalSurface* surfDoDi= new G4OpticalSurface("WaterSurface1");
+    surfDoDi->SetType(dielectric_dielectric);    
+    surfDoDi->SetModel(unified);
+    surfDoDi->SetFinish(groundfrontpainted);
+
+    
+
+    G4LogicalBorderSurface* waterSurface1 = new G4LogicalBorderSurface("WaterSurface", physDoDi1, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface2 = new G4LogicalBorderSurface("WaterSurface", physDoDi2, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface3 = new G4LogicalBorderSurface("WaterSurface", physDoDi3, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface4 = new G4LogicalBorderSurface("WaterSurface", physDoDi4, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface5 = new G4LogicalBorderSurface("WaterSurface", physDoDi5, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface6 = new G4LogicalBorderSurface("WaterSurface", physDoDi6, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface7 = new G4LogicalBorderSurface("WaterSurface", physDoDi7, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface8 = new G4LogicalBorderSurface("WaterSurface", physDoDi8, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface9 = new G4LogicalBorderSurface("WaterSurface", physDoDi9, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface10 = new G4LogicalBorderSurface("WaterSurface", physDoDi10, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface11 = new G4LogicalBorderSurface("WaterSurface", physDoDi11, physWorld, surfDoDi);
+    G4LogicalBorderSurface* waterSurface12 = new G4LogicalBorderSurface("WaterSurface", physDoDi12, physWorld, surfDoDi);
+
+    G4MaterialPropertiesTable *mptDoDi = new G4MaterialPropertiesTable();
+    mptDoDi->AddProperty("TRANSMITTANCE", energy, transmittance,2);
+    mptDoDi->AddProperty("REFLECTIVITY",energy, reflectivity,2);
+    surfDoDi->SetMaterialPropertiesTable(mptDoDi);
+
+
     return physWorld;
     //return physWorld1;
 

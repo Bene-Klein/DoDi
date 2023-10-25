@@ -1,4 +1,7 @@
 /run/initialize
-/gun/momentumAmp 100 MeV
+/gps/particle gamma
+/gps/ene/type Mono
+/gps/ene/mono 2.6 MeV
+/gps/ang/type iso
 /run/reinitializeGeometry 
 /run/beamOn 100000
