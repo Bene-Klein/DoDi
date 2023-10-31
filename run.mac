@@ -4,4 +4,4 @@
 /gps/ene/mono 2.6 MeV
 /gps/ang/type iso
 /run/reinitializeGeometry 
-/run/beamOn 100000
+/run/beamOn 10000
