@@ -22,11 +22,26 @@ G4bool MySensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *ROhis
 
     G4int copyNo = touchable->GetCopyNumber();
 
-    //G4cout << "Copy number: "<< copyNo <<G4endl;
+    G4int parentId = aStep->GetTrack()->GetParentID();
+    
+    G4int EventID = G4RunManager::GetRunManager() -> GetCurrentEvent() -> GetEventID();
+
+    G4double Time = aStep->GetPreStepPoint()->GetGlobalTime();
+    
+    //G4cout << "Time: "<< Time <<G4endl;
+    //G4cout << "ID: "<< EventID <<G4endl;
 
     G4VPhysicalVolume *physVol = touchable->GetVolume();
     G4ThreeVector posDetector = physVol->GetTranslation();
 
     //G4cout << "Detector position: "<< posDetector <<G4endl;
+
+    G4AnalysisManager *man = G4AnalysisManager::Instance();
+
+    man->FillNtupleDColumn(0,0,Time);
+    man->FillNtupleIColumn(0,1,copyNo);
+    man->FillNtupleIColumn(0,2,EventID); //FillNtupleDColumn(Ntuple Number, Entry Number, Entry)
+
+    man->AddNtupleRow();
 
 }

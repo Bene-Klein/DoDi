@@ -4,6 +4,12 @@
 MyEventAction::MyEventAction(MyRunAction*)
 {
     fEdep = 0.;
+    /*
+    Time =0.;
+    CopyNO =0;
+    */
+    EventID=0;
+    
 }
 
 MyEventAction::~MyEventAction()
@@ -12,15 +18,13 @@ MyEventAction::~MyEventAction()
 void MyEventAction::BeginOfEventAction(const G4Event*)
 {
     fEdep = 0.;
+    //EventID = GetEventID();   
 }
+
 
 void MyEventAction::EndOfEventAction(const G4Event*)
 {
-    //G4cout << "Energy depostion: " << fEdep << G4endl;
+    //G4cout << "Event ID: " << EventID << G4endl;
 
-    G4AnalysisManager *man = G4AnalysisManager::Instance();
-
-    man->FillNtupleDColumn(1,0,fEdep); //FillNtupleDColumn(Ntuple Number, Entry Number, Entry)
-
-    man->AddNtupleRow(1);
+    
 }

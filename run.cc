@@ -5,15 +5,10 @@ MyRunAction::MyRunAction()
     G4AnalysisManager *man = G4AnalysisManager::Instance();
 
     man->CreateNtuple("Hits","Hits");
-    man->CreateNtupleIColumn("fEvent");
-    man->CreateNtupleDColumn("fX");
-    man->CreateNtupleDColumn("fY");
-    man->CreateNtupleDColumn("fZ");
+    man->CreateNtupleDColumn("Time");
+    man->CreateNtupleIColumn("Detector");
+    man->CreateNtupleIColumn("EventID");
     man->FinishNtuple(0);
-
-    man->CreateNtuple("Scoring","Scoring");    
-    man->CreateNtupleDColumn("EnergyDep");
-    man->FinishNtuple(1);
 }
 
 MyRunAction::~MyRunAction()

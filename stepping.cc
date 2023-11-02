@@ -21,4 +21,6 @@ void MySteppingAction::UserSteppingAction(const G4Step *step)
 
     G4double edep= step->GetTotalEnergyDeposit();
     fEventAction->AddEdep(edep);
+
+    //G4double Time = step->GetPreStepPoint()->GetGlobalTime();
 }
