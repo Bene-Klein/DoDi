@@ -1,4 +1,7 @@
 /run/initialize
+/gps/pos/type Volume
+/gps/pos/shape Sphere
+/gps/pos/radius 500. mm
 /gps/particle gamma
 /gps/ene/type Mono
 /gps/ene/mono 2.6 MeV

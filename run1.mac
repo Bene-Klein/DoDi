@@ -1,10 +1,10 @@
 /run/initialize
 /gps/pos/type Volume
 /gps/pos/shape Sphere
-/gps/pos/halfx 50 mm
+/gps/pos/radius 50. mm
 /gps/particle gamma
 /gps/ene/type Mono
 /gps/ene/mono 2.6 MeV
 /gps/ang/type iso
 /run/reinitializeGeometry 
-/run/beamOn 10000
+/run/beamOn 1000
